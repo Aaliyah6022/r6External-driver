@@ -1,0 +1,80 @@
+;
+; BeDriver.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=BeDriver.cat
+DriverVer = 11/11/2021,19.42.28.299
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+BeDriver_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+BeDriver.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%BeDriver.DeviceDesc%=BeDriver_Device, Root\BeDriver ; TODO: edit hw-id
+
+[BeDriver_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+BeDriver.sys
+
+;-------------- Service installation
+[BeDriver_Device.NT.Services]
+AddService = BeDriver,%SPSVCINST_ASSOCSERVICE%, BeDriver_Service_Inst
+
+; -------------- BeDriver driver install sections
+[BeDriver_Service_Inst]
+DisplayName    = %BeDriver.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\BeDriver.sys
+
+;
+;--- BeDriver_Device Coinstaller installation ------
+;
+
+[BeDriver_Device.NT.CoInstallers]
+AddReg=BeDriver_Device_CoInstaller_AddReg
+CopyFiles=BeDriver_Device_CoInstaller_CopyFiles
+
+[BeDriver_Device_CoInstaller_AddReg]
+;
+
+
+[BeDriver_Device_CoInstaller_CopyFiles]
+;
+
+
+[BeDriver_Device.NT.Wdf]
+KmdfService =  BeDriver, BeDriver_wdfsect
+[BeDriver_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "BeDriver Installation Disk"
+BeDriver.DeviceDesc = "BeDriver Device"
+BeDriver.SVCDESC = "BeDriver Service"
